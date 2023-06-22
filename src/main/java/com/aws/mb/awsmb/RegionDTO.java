@@ -1,10 +1,12 @@
 package com.aws.mb.awsmb;
 
-import java.util.Collection;
+import com.amazonaws.services.ec2.model.AvailabilityZone;
+import com.amazonaws.services.ec2.model.DescribeRegionsResult;
 
-public record RegionDTO (
-        String regionName,
-        Collection<String> availableEndpoints
-)
-{
+import java.util.List;
+
+public record RegionDTO(
+        DescribeRegionsResult regions_response,
+        List<AvailabilityZone> availabilityZones
+) {
 }
