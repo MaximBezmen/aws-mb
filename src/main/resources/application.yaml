@@ -1,0 +1,10 @@
+cloud:
+  aws:
+    credentials:
+      access-key: TEST
+      secret-key: TEST
+      profile-name: TEST
+    region:
+      static: eu-central-1
+      auto: true
+
