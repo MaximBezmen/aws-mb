@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  db:
+    container_name: aws_mb
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_DATABASE=db_m_bezmen
+      - MYSQL_USER=m_bezmen
+      - MYSQL_PASSWORD=m_bezmen
+      - MYSQL_ROOT_PASSWORD=m_bezmen
+    ports:
+      - '3306:3306'
