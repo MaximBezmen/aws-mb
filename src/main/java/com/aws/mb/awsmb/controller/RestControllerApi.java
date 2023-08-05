@@ -1,29 +1,23 @@
-package com.aws.mb.awsmb.Controller;
+package com.aws.mb.awsmb.controller;
 
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.model.DescribeRegionsResult;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.AccessControlList;
-import com.amazonaws.services.s3.model.S3Object;
 import com.aws.mb.awsmb.RegionDTO;
-import org.springframework.ui.Model;
+import com.aws.mb.awsmb.service.S3ObjectDataService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-
 
 @RestController
 @RequestMapping("/")
-public class RegionController {
-    private static final String BUCKET = "m.bezmen-bucket-task2";
-    private final AmazonS3 amazonS3Client;
+public class RestControllerApi {
+    private final S3ObjectDataService s3ObjectDataService;
     private final AmazonEC2 amazonEC2;
 
-    public RegionController(AmazonS3 amazonS3Client, AmazonEC2 amazonEC2) {
-        this.amazonS3Client = amazonS3Client;
+    public RestControllerApi(S3ObjectDataService s3ObjectDataService, AmazonEC2 amazonEC2) {
+        this.s3ObjectDataService = s3ObjectDataService;
         this.amazonEC2 = amazonEC2;
     }
 
@@ -34,10 +28,13 @@ public class RegionController {
         return new RegionDTO(amazonEC2.describeRegions(), amazonEC2.describeAvailabilityZones().getAvailabilityZones());
     }
 
-    @GetMapping("/files")
-    public String getFile(Model model, @RequestParam("image") String key) throws IOException {
-        S3Object object = amazonS3Client.getObject(BUCKET, key);
+    @GetMapping("/file")
+    public String getFile(@RequestParam("image") String key) {
+        return s3ObjectDataService.getFile(key);
+    }
 
-        return object.toString();
+    @GetMapping("/files")
+    public String getFiles(@RequestParam("image") String key) {
+        return s3ObjectDataService.getFiles();
     }
 }

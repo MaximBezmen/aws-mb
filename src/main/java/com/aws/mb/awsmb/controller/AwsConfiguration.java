@@ -1,4 +1,4 @@
-package com.aws.mb.awsmb.Controller;
+package com.aws.mb.awsmb.controller;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
