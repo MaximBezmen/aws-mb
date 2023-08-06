@@ -49,6 +49,16 @@ public class S3ObjectData {
         this.getLastModified = getLastModified;
     }
 
+    @Override
+    public String toString() {
+        return "S3ObjectData{" +
+                "name='" + name + '\'' +
+                ", size=" + size +
+                ", extension='" + extension + '\'' +
+                ", getLastModified=" + getLastModified +
+                '}';
+    }
+
     public Long getId() {
         return id;
     }

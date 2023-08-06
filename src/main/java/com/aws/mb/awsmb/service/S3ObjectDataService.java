@@ -9,8 +9,6 @@ import com.aws.mb.awsmb.entity.S3ObjectData;
 import com.aws.mb.awsmb.repository.S3ObjectDataRepository;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -23,10 +21,12 @@ public class S3ObjectDataService {
 
     private final AmazonS3 amazonS3Client;
     private final S3ObjectDataRepository repository;
+    private final SnSAndSqsService snSAndSqsService;
 
-    public S3ObjectDataService(AmazonS3 amazonS3Client, S3ObjectDataRepository repository) {
+    public S3ObjectDataService(AmazonS3 amazonS3Client, S3ObjectDataRepository repository, SnSAndSqsService snSAndSqsService) {
         this.amazonS3Client = amazonS3Client;
         this.repository = repository;
+        this.snSAndSqsService = snSAndSqsService;
     }
 
     public void uploadImage(MultipartFile file) throws IOException {
@@ -44,6 +44,8 @@ public class S3ObjectDataService {
         s3ObjectData.setSize(file.getSize());
 
         repository.save(s3ObjectData);
+
+        snSAndSqsService.pushToSqs(s3ObjectData.toString());
     }
 
 
