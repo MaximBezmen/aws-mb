@@ -13,11 +13,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SnSAndSqsService {
-    private static final String TOPIC_ARN = "m-bezmen-uploads-notification-topic";
-    private static final String QUEUE_URL = "m-bezmen-uploads-notification-queue";
+    private static final String TOPIC_ARN = "arn:aws:sns:eu-north-1:011598235806:m-bezmen-uploads-notification-topic";
+    private static final String QUEUE_URL = "https://sqs.eu-north-1.amazonaws.com/011598235806/m-bezmen-uploads-notification-queue";
     private final AmazonSNS amazonSNS;
     private final AmazonSQSAsync amazonSQSAsync;
     private final SnsSubscriberRepository snsSubscriberRepository;
@@ -48,12 +49,16 @@ public class SnSAndSqsService {
 
     public String unsubscribeToTopic(String email) {
 
-        SnsSubscriber snsSubscriber = snsSubscriberRepository.findByEmail(email);
+        ListSubscriptionsResult listResult = amazonSNS.listSubscriptions();
 
-        UnsubscribeRequest unsubscribeRequest = new UnsubscribeRequest(snsSubscriber.getSubscriptionArn());
+        Optional<Subscription> subscriptionOptional = listResult.getSubscriptions().stream()
+                .filter(subscription -> subscription.getEndpoint().equals(email))
+                .findFirst();
 
-        UnsubscribeResult unsubscribe = amazonSNS.unsubscribe(unsubscribeRequest);
-
+        if (subscriptionOptional.isPresent()){
+            UnsubscribeRequest unsubscribeRequest = new UnsubscribeRequest(subscriptionOptional.get().getSubscriptionArn());
+            UnsubscribeResult unsubscribe = amazonSNS.unsubscribe(unsubscribeRequest);
+        }
 
         return "Unsubscription ARN request is done.";
     }
@@ -69,7 +74,7 @@ public class SnSAndSqsService {
     }
 
     @Scheduled(cron = "0 * * * * *")
-    public void readFromSqsAndSendToSns(){
+    public void readFromSqsAndSendToSns() {
         List<Message> messages = readFromSqs();
         messages.forEach(message -> sendToTopic(message.getBody()));
     }
